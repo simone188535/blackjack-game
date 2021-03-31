@@ -20,7 +20,7 @@ Quick interjection before we start. Please follow these steps for your submissio
 
 **DO NOT:**
 
-- Create a PR into this repo. We want your solution to be yours only so we wouldn't anyone else to accidentally see it.
+- Create a PR into this repo. We want your solution to be yours only so we wouldn't want anyone else to accidentally see it.
 
 ## Requirements
 
