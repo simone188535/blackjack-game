@@ -15,7 +15,7 @@ This project will show us **how you work with APIs and how you structure your Re
 Quick interjection before we start. Please follow these steps for your submission:
 
 1. Fork this repo. It's private & read-only, so you'll need your own copy.
-2. Make your changes - remember to commit often so we can follow along with progress and see how long you take.
+2. Make your changes - remember to commit often so we can follow along with your progress.
 3. Send us your private fork. We'll do a code-review internally and get back to you with next steps.
 
 **DO NOT:**
