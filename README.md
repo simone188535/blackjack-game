@@ -2,11 +2,29 @@
 
 Hey there,
 
-The team is excited to move onto the next portion of the interview with you! This part of the interview will be a take-home assignment, where you’ll showcase your process and approach when it comes to working on a realish-world feature - **a small React project implementing a simple version of Blackjack**. This project **should take about 2-4 hours** – we know your time is valuable, so if takes any longer than that, then cut it short and just show us what you’ve got.
+The team is excited to move onto the next portion of the interview with you! 
+
+> **PLEASE READ EVERYTHING BEFORE YOU START!**
+
+This part of the interview will be a take-home assignment, where you’ll showcase your process and approach when it comes to working on a realish-world feature/product - **a small React project implementing a simple version of Blackjack**. This project **should take about 2-4 hours** – we know your time is valuable, so if takes any longer than that, please cut it short and just show us what you’ve ended up with.
 
 This project will show us **how you work with APIs and how you structure your React code**. When you come on-site, we’ll spend one of the interview sessions collaboratively expanding upon your work, so write it with some extensibility in mind.
 
-Now, onto Blackjack. If you’re not familiar with the game, here are the **simplified rules we will be going by for this project:**
+## Submitting your assignment
+
+Quick interjection before we start. Please follow these steps for your submission:
+
+1. Fork this repo. It's private & read-only, so you'll need your own copy.
+2. Make your changes - remember to commit often so we can follow along with your progress.
+3. Send us your private fork. We'll do a code-review internally and get back to you with next steps.
+
+**DO NOT:**
+
+- Create a PR into this repo. We want your solution to be yours only so we wouldn't want anyone else to accidentally see it.
+
+## Requirements
+
+Now, onto Blackjack. If you’re not familiar with the game, here are the **simplified rules we will be going by for this project.** We know this isn't Blackjack exactly, but try not to deviate from the requirements (even if you're a Blackjack veteran 🃏)**:**
 
 1. The game consists of two players: You vs The House (the computer), where the goal is to beat the The House’s hand, without going over 21
 2. A card contains a “point” value equivalent to it’s number (the 3 of club is worth 3 points…the 9 of spades is worth 9 points…etc etc). Face cards (Jack, Queen, King) are worth TEN points, and the Ace card is either worth 1 or 11, whichever is most helpful for the player’s hand. For example:
@@ -30,9 +48,9 @@ Now, onto Blackjack. If you’re not familiar with the game, here are the **simp
 
 To implement this, you’ll use this API for card management: [http://deckofcardsapi.com/](http://deckofcardsapi.com/). You should be able to initialize one deck and deal out cards from the deck using this API.
 
-**What we are looking for:**
+## **What we are looking for**
 
-1. Setting up a React project. You are welcome to use [create-react-app](https://github.com/facebook/create-react-app).
+1. Setting up a React project from scratch. You are welcome to use [create-react-app](https://github.com/facebook/create-react-app).
     1. Show us judgment in how you structure and decompose your code. Remember to optimize as much for readability as well as performance. Good abstractions and indirections = extensibility without over-engineering.
     2. Show us good understanding of React fundamentals and best practices
 2. Interacting with the API at [http://deckofcardsapi.com/](http://deckofcardsapi.com/)
@@ -48,4 +66,4 @@ Bonus points:
 
 Although this may take between 2-4 hours, this trivial project really shows us a good reflection of how you write code. Once you come on-site we’ll definitely expand upon it!
 
-Another note, there are obviously various online projects of Blackjack and again, this isn’t really an assessment of giving the right or wrong answer, but an opportunity to showcase your thought process and highlight your strengths. We hope you have fun with the assignment, and please let us know if you have any questions. Please send back a GitHub repo with your solution - we look forward to seeing what you put together!
+Another note, there are obviously various online projects of Blackjack and again, this isn’t really an assessment of giving the right or wrong answer, but an opportunity to showcase **your thought process and highlight your strengths**. We hope you have fun with the assignment, and please let us know if you have any questions.
