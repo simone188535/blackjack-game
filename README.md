@@ -6,7 +6,7 @@ The team is excited to move onto the next portion of the interview with you!
 
 > **PLEASE READ EVERYTHING BEFORE YOU START!**
 
-This part of the interview will be a take-home assignment, where you’ll showcase your process and approach when it comes to working on a realish-world feature/product - **a small React project implementing a simple version of Blackjack**. This project **should take about 2-4 hours** – we know your time is valuable, so if takes any longer than that, please cut it short and just show us what you’ve ended up with.
+This part of the interview will be a take-home assignment, where you’ll showcase your process and approach when it comes to working on a realish-world feature/product - **a small React project implementing a simple version of Blackjack**. This project **should take about 2-4 hours** – we know your time is valuable, so if takes any longer than that, please cut it short and just show us what you end up with in that time.
 
 This project will show us **how you work with APIs and how you structure your React code**. When you come on-site, we’ll spend one of the interview sessions collaboratively expanding upon your work, so write it with some extensibility in mind.
 
@@ -15,8 +15,13 @@ This project will show us **how you work with APIs and how you structure your Re
 Quick interjection before we start. Please follow these steps for your submission:
 
 1. Fork this repo. It's private & read-only, so you'll need your own copy.
-2. Make your changes - remember to commit often so we can follow along with your progress.
-3. Send us your private fork. We'll do a code-review internally and get back to you with next steps. Please ensure your recruiter has access.
+2. As soon as you clone it down, make an empty commit to mark when you started.
+> **NOT FOLLOWING THIS STEP WILL INVALIDATE YOUR SUBMISSION**
+```sh
+git commit -m "Initial commit" --allow-empty
+```
+3. Make your changes - remember to commit often so we can follow along with your progress.
+4. Send us your private fork. We'll do a code-review internally and get back to you with next steps. Please ensure your recruiter has access.
 
 **DO NOT:**
 
