@@ -72,3 +72,24 @@ Bonus points:
 Although this may take between 2-4 hours, this trivial project really shows us a good reflection of how you write code. Once you come on-site we’ll definitely expand upon it!
 
 Another note, there are obviously various online projects of Blackjack and again, this isn’t really an assessment of giving the right or wrong answer, but an opportunity to showcase **your thought process and highlight your strengths**. We hope you have fun with the assignment, and please let us know if you have any questions.
+
+## Running the app
+
+To start developing your app just run `npm i` and `npm start`. Start building your app by modifying `src/App.tsx`.
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
