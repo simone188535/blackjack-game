@@ -5,7 +5,8 @@ import { fetchNewDeck, drawCards } from "../API/getRequests";
 interface ICard {
   code: string;
   image: string;
-  value: number;
+  // value: number;
+  value: string;
   suit: string;
 }
 
@@ -42,14 +43,25 @@ function GameArena() {
         ? drawCards(deckId, 2)
         : drawCards(deckId, 1);
 
-    if (!playerTurn) {
-      // computer draws cards
-      drawAppropriateNumOfCards(cardsInfo.computerCards.cards);
-      setPlayerTurn(true);
-    } else {
-      // player draws cards
-      drawAppropriateNumOfCards(cardsInfo.playerCards.cards);
-    }
+    (async () => {
+      if (!playerTurn) {
+        // computer draws cards
+        const {
+          data: {
+            cards: { code, image, value, suit },
+          },
+        } = await drawAppropriateNumOfCards(cardsInfo.computerCards.cards);
+        //  setCardsInfo(prevState => ({
+        //   ...prevState,
+
+        //  }));
+
+        setPlayerTurn(true);
+      } else {
+        // player draws cards
+        await drawAppropriateNumOfCards(cardsInfo.playerCards.cards);
+      }
+    })();
   }, [
     cardsInfo.computerCards.cards,
     cardsInfo.playerCards.cards,
