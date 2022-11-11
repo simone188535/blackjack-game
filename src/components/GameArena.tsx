@@ -2,72 +2,69 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 
-interface ICard {
+export interface ICard {
   code: string;
   image: string;
   // value: number;
+  images: {
+    svg: string;
+    png: string;
+  };
   value: string;
   suit: string;
-}
-
-interface ICardsInfo {
-  playerCards: {
-    cards: ICard[];
-    total: number;
-  };
-  computerCards: {
-    cards: ICard[];
-    total: number;
-  };
 }
 
 function GameArena() {
   const [playerTurn, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
-  const [cardsInfo, setCardsInfo] = useState<ICardsInfo>({
-    playerCards: {
-      cards: [],
-      total: 0,
-    },
-    computerCards: {
-      cards: [],
-      total: 0,
-    },
-  });
+  const [playerDrawCard, setPlayerDrawCard] = useState(false);
+  const [playersCards, setPlayersCards] = useState<ICard[]>([]);
+  const [computersCards, setComputersCards] = useState<ICard[]>([]);
 
   const drawCard = useCallback(() => {
     if (!deckId) return;
-    // if the current player neither play has cards, draw 2 cards, else draw 1
-    const drawAppropriateNumOfCards = (currPlayerCardArr: ICard[]) =>
-      currPlayerCardArr.length === 0
-        ? drawCards(deckId, 2)
-        : drawCards(deckId, 1);
 
-    (async () => {
-      if (!playerTurn) {
+    // if the current player neither play has cards, draw 2 cards, else draw 1
+    if (computersCards.length === 0 && !playerTurn) {
+      (async () => {
         // computer draws cards
         const {
-          data: {
-            cards: { code, image, value, suit },
-          },
-        } = await drawAppropriateNumOfCards(cardsInfo.computerCards.cards);
-        //  setCardsInfo(prevState => ({
-        //   ...prevState,
+          data: { cards },
+        } = await drawCards(deckId, 2);
 
-        //  }));
+        setComputersCards(cards);
 
+        // change turns
         setPlayerTurn(true);
-      } else {
-        // player draws cards
-        await drawAppropriateNumOfCards(cardsInfo.playerCards.cards);
-      }
-    })();
-  }, [
-    cardsInfo.computerCards.cards,
-    cardsInfo.playerCards.cards,
-    deckId,
-    playerTurn,
-  ]);
+        setPlayerDrawCard(true);
+      })();
+    }
+
+    if (playersCards.length === 0 && playerTurn && playerDrawCard) {
+      (async () => {
+        const {
+          data: { cards },
+        } = await drawCards(deckId, 2);
+
+        setPlayersCards(cards);
+        // the player is done drawing a card
+        setPlayerTurn(false);
+      })();
+    } else if(playerTurn && playerDrawCard) {
+      // else it is players turn to pick a card
+      (async () => {
+        const {
+          data: { cards },
+        } = await drawCards(deckId);
+        console.log(cards);
+        // add card to playersCards
+        setPlayersCards(prevState => [...prevState, ...cards]);
+        // the player is done drawing a card
+        setPlayerTurn(false);
+      })();
+    }
+  }, [deckId, computersCards.length, playerTurn, playersCards.length, playerDrawCard]);
+
 
   useEffect(() => {
     (async () => {
@@ -83,6 +80,11 @@ function GameArena() {
       drawCard();
     })();
   }, [drawCard]);
+
+  useEffect(() => {
+    console.log("playersCards", playersCards);
+    console.log("computersCards", computersCards);
+  }, [computersCards, playersCards]);
 
   return <div className="">Hello</div>;
 }
