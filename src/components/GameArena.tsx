@@ -238,12 +238,23 @@ function GameArena() {
         setDidPlayerWin(true);
       }
     } else if (didPlayerStand) {
-      // if the player did stand and there is a tie, the computer wins
-      if (totalPlayerInfo.total === totalComputerInfo.total) {
+      // if the player did stand and there is a tie OR the users cards total less than the computers cards, the computer wins
+      if (totalPlayerInfo.total === totalComputerInfo.total || totalPlayerInfo.total < totalComputerInfo.total) {
         setDidPlayerWin(false);
       }
 
-      
+      // if the player has more points than the computer, the pplayer wins
+      if (totalPlayerInfo.total > totalComputerInfo.total) {
+        setDidPlayerWin(true);
+      } else {
+        // if the player and computer tie or the player has few points than the computer, the player loses
+        setDidPlayerWin(false);
+      }
+
+      // // the users cards total less than the computers cards, the computer wins
+      // if (totalPlayerInfo.total < totalComputerInfo.total) {
+      //   setDidPlayerWin(false);
+      // }
     }
   }, [didPlayerStand, totalComputerInfo.acePositions.length, totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
   
@@ -326,7 +337,7 @@ function GameArena() {
         <div>User</div>
         <MapCards cards={playersCards} />
         <section className="btn-container">
-          <button type="button" onClick={() => drawCard()} disabled={didPlayerStand}>
+          <button type="button" onClick={() => drawCard()} disabled={didPlayerStand || didPlayerWin !== null}>
             Hit
           </button>
           <button type="button" onClick={() => setDidPlayerStand(true)}>Stand</button>
