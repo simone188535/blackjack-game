@@ -137,8 +137,11 @@ function GameArena() {
   
   // check if a winner is present
   useEffect(() => {
-    // if the player has a total of 21, the game is over and they win
-    if (totalPlayerInfo.total === 21) {
+    // if the player and the computer both get 21, the player loses
+    if (totalPlayerInfo.total === 21 && totalComputerInfo.total === 21) {
+      setDidPlayerWin(false);
+    } else if (totalPlayerInfo.total === 21) {
+      // if the player has a total of 21, the game is over and they win
       setDidPlayerWin(true);
     } else if (totalComputerInfo.total === 21) {
       // if the computer has a total of 21, the game is over and it wins
