@@ -17,7 +17,7 @@ export interface ICard {
 interface ITotalInfo {
   total: number;
   acePositions: Number[];
-  lastReadCardIndex: number;
+  // lastReadCardIndex: number;
 }
 
 function GameArena() {
@@ -28,14 +28,14 @@ function GameArena() {
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0,
+    // lastReadCardIndex: 0,
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
   const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0,
+    // lastReadCardIndex: 0,
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -132,17 +132,18 @@ function GameArena() {
 
   const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
     let total = 0;
-      cardsArr.forEach(({ value }) => {
+    const acePositionArr: number[] = [];
+
+      cardsArr.forEach(({ value }, index) => {
         // if the value is a number, simply add it to currTotal
          if (value === "QUEEN" || value ==="KING" || value === "JACK") {
-          console.log('Face');
           // if the value is a face card add 10
           total += 10;
         } else if (value === "ACE" ) {
-          console.log('Ace');
           // if the value is an ace, by default is equal to 11
           total += 11;
           // acePosition.push(currIndex);
+          acePositionArr.push(index);
         } else {
           const NumericVal = Number(value);
           total += NumericVal;
@@ -151,7 +152,8 @@ function GameArena() {
 
       setStateFunc((prevState) => ({
         ...prevState,
-        total
+        total,
+        acePositions: [...acePositionArr]
       }));
   }, []);
 
