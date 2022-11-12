@@ -185,11 +185,14 @@ function GameArena() {
     }
   }, [didPlayerStand, totalComputerInfo.acePositions.length, totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
   
-  useEffect(() => {
-    console.log(didPlayerWin);
-  }, [didPlayerWin]);
+  const winLoseText = () => {
+    if (didPlayerWin === null) return <></>;
+    return <div>{(didPlayerWin) ? "You Won" : "You Lose"}</div>;
+  }
 
   return (
+    <>
+    {winLoseText()}
     <div className="game-arena">
       <section className="game-panel panel-one">
         <h1>Computer</h1>
@@ -197,8 +200,10 @@ function GameArena() {
         <div>Total: {totalComputerInfo.total}</div>
       </section>
       <section className="game-panel panel-two">
-        <div>User</div>
+        <h1>User</h1>
         <MapCards cards={playersCards} />
+        <div>Total: {totalPlayerInfo.total}</div>
+        {winLoseText()}
         <section className="btn-container">
           <button type="button" onClick={() => drawCard()} disabled={didPlayerStand || didPlayerWin !== null}>
             Hit
@@ -207,9 +212,9 @@ function GameArena() {
           {/* This is reset button can be done by resetting state but I'm out of time */}
           <button type="button" onClick={() => {window.location.href="/"}}>Reset</button>
         </section>
-        <div>Total: {totalPlayerInfo.total}</div>
       </section>
     </div>
+    </>
   );
 }
 
