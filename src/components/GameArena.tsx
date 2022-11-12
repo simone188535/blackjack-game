@@ -89,8 +89,11 @@ function GameArena() {
     })();
   }, [deckId]);
 
-  // to memoize, pass in the obj key instead
-
+  /* 
+  In the future, this calculation can be memoized, instead of calculating the total from the
+  beginning of the array, the position of the last element can be saved and the array can 
+  iterate from that position rather than the beginning
+  */
   const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
     let total = 0;
     const acePositionArr: number[] = [];
