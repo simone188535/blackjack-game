@@ -14,14 +14,31 @@ export interface ICard {
   suit: string;
 }
 
+interface ITotalInfo {
+  total: number;
+  acePositions: [];
+  lastReadCardIndex: number;
+}
+
 function GameArena() {
   const [playerTurn, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
+
   const [playersCards, setPlayersCards] = useState<ICard[]>([]);
-  const [playersTotal, setPlayersTotal] = useState(0);
+  const [totalPlayerInfo, setTotalPlayerInfo]  = useState<ITotalInfo>({
+    total: 0,
+    acePositions: [],
+    lastReadCardIndex: 0,
+  });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
-  const [computersTotal, setComputerTotal] = useState(0);
+  const [totalComputerInfo, setTotalComputerInfo]  = useState<ITotalInfo>({
+  total: 0,
+  acePositions: [],
+  lastReadCardIndex: 0,
+});
+
+  const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
 
   const drawCard = useCallback(() => {
     if (deckId && playerTurn) {
@@ -75,15 +92,70 @@ function GameArena() {
   }, [deckId]);
 
   useEffect(() => {
+    // if cards were added recalculate the total
+
+    const calcCardTotal = (totalInfoObj: ITotalInfo, arr: ICard[]) => {
+        // start array at lastReadCardIndex
+        let currIndex = totalInfoObj.lastReadCardIndex;
+        const acePosition = [];
+
+        const arrFromStartingPoint = arr.slice(currIndex);
+        let currTotal = totalInfoObj.total;
+      
+        arrFromStartingPoint.forEach(({value}) => {
+          // if the value is a number, simply add it to currTotal
+          const NumericVal = Number(value);
+          if (!!isNaN(NumericVal) === true) {
+            currTotal += NumericVal;
+          } else if (value === "ACE") {
+            // if the value is an ace, by default is equal to 11
+            currTotal += 11;
+            acePosition.push(currIndex);
+          } else {
+            // if the value is a face card add 10
+            currTotal += 10;
+          }
+          currIndex++;
+        })
+
+        // update state for the provided obj
+
+      // arr.map
+    }
+
+    
+    // if the most current card was not read, recalculate the total
+    if (playersCards.length !== totalPlayerInfo.lastReadCardIndex) {
+
+    }
+
+
+  }, [playersCards.length, totalPlayerInfo.lastReadCardIndex]);
+
+  useEffect(() => {
     console.log("playersCards", playersCards);
     console.log("computersCards", computersCards);
   }, [computersCards, playersCards]);
+
+  // const calcTotals = (currentUser: ITotalInfo, cards: ICard[]) => {
+
+  //   // calculate the current total using the last read card index
+
+  // }
+
+  // useEffect(() => {
+  //   // if the computer or the user have a number larger than 21, check if they have aces, if so subtract the 10 from the value and add 1
+  // }, []);
+
+
+
 
   return (
     <div className="game-arena">
       <section className="game-panel panel-one">
         <h1>Computer</h1>
         <MapCards cards={computersCards} />
+        <div>Total: {totalPlayerInfo.total}</div>
       </section>
       <section className="game-panel panel-two">
         <div>User</div>
@@ -94,9 +166,12 @@ function GameArena() {
           </button>
           <button type="button">Stand</button>
         </section>
+        <div>Total: {totalComputerInfo.total}</div>
       </section>
     </div>
   );
 }
+
+// by default aces can be given a value of 10
 
 export default GameArena;
