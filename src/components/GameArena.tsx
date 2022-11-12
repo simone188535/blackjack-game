@@ -92,45 +92,6 @@ function GameArena() {
     })();
   }, [deckId]);
 
-  // const calcCardTotal = (totalInfoObj: ITotalInfo, arr: ICard[]) => {
-  //   // start array at lastReadCardIndex
-  //   let currIndex = totalInfoObj.lastReadCardIndex;
-  //   console.log(currIndex);
-  //   const acePosition: Number[] = [];
-
-  //   const arrFromStartingPoint = arr.slice(currIndex);
-  //   let currTotal = totalInfoObj.total;
-
-  //   arrFromStartingPoint.forEach(({ value }) => {
-  //     // if the value is a number, simply add it to currTotal
-  //      if (value === "QUEEN" || value ==="KING" || value === "JACK") {
-  //       console.log('Face');
-  //       // if the value is a face card add 10
-  //       currTotal += 10;
-  //     } else if (value === "ACE" ) {
-  //       console.log('Ace');
-  //       // if the value is an ace, by default is equal to 11
-  //       currTotal += 11;
-  //       acePosition.push(currIndex);
-  //     } else {
-  //       const NumericVal = Number(value);
-  //       currTotal += NumericVal;
-  //     }
-  //     currIndex += 1;
-  //   });
-
-  //   return { currTotal, acePosition, currIndex };
-
-  //   // // update state for the provided obj
-
-  //   // setStateToChange((prevState) => ({
-  //   //   ...prevState,
-  //   //   total: currTotal,
-  //   //   acePositions: [...prevState.acePositions, ...acePosition],
-  //   //   lastReadCardIndex: currIndex,
-  //   // }));
-  // };
-
   // to memoize, pass in the obj key instead
 
   const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
@@ -173,35 +134,6 @@ function GameArena() {
       calcCardTotal(computersCards, setTotalComputerInfo);
     }
   }, [calcCardTotal, computersCards]);
-
-
-  // // reset game 
-  // const resetGame = () => {
-  //   // reset deckID
-  //   setDeckId(null);
-  //   // reset players turn
-  //   setPlayerTurn(false);
-  //   // remove all cards from users
-  //   setPlayersCards([]);
-  //   setComputersCards([]);
-  //   // reset totals
-  //   setTotalPlayerInfo({
-  //     total: 0,
-  //   acePositions: [],
-  //   lastReadCardIndex: 0,
-  //   });
-  //   setTotalComputerInfo({
-  //     total: 0,
-  //   acePositions: [],
-  //   lastReadCardIndex: 0,
-  //   });
-  //   // unset winner
-  //   setDidPlayerWin(null);
-  // }
-
-  const checkForWinner = useCallback(() => {
-    
-  }, []);
   
   // check if a winner is present
   useEffect(() => {
@@ -250,81 +182,12 @@ function GameArena() {
         // if the player and computer tie or the player has few points than the computer, the player loses
         setDidPlayerWin(false);
       }
-
-      // // the users cards total less than the computers cards, the computer wins
-      // if (totalPlayerInfo.total < totalComputerInfo.total) {
-      //   setDidPlayerWin(false);
-      // }
     }
   }, [didPlayerStand, totalComputerInfo.acePositions.length, totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
   
   useEffect(() => {
     console.log(didPlayerWin);
   }, [didPlayerWin]);
-
-  // useEffect(() => {
-  //   // if cards were added recalculate the total
-
-  //   // if the most current playersCards was not read, recalculate the total
-  //   // if (playersCards.length !== totalPlayerInfo.lastReadCardIndex) {
-  //     const {
-  //       currTotal: currTotalPlayer,
-  //       acePosition: acePositionPlayer,
-  //       currIndex: currIndexPlayer,
-  //     } = calcCardTotal(totalPlayerInfo, playersCards);
-
-  //     // // update state for the provided obj
-
-      // setTotalPlayerInfo((prevState) => ({
-      //   ...prevState,
-      //   total: currTotalPlayer,
-      //   acePositions: [...prevState.acePositions, ...acePositionPlayer],
-      //   lastReadCardIndex: currIndexPlayer,
-      // }));
-  //   // }
-
-  //   // if the most current card was not read, recalculate the total
-  //   // if (computersCards.length !== totalComputerInfo.lastReadCardIndex) {
-  //   //   const {} = calcCardTotal(totalComputerInfo, computersCards);
-
-  //     // // update state for the provided obj
-
-  //     // setTotalComputerInfo((prevState) => ({
-  //     //   ...prevState,
-  //     //   total: currTotal,
-  //     //   acePositions: [...prevState.acePositions, ...acePosition],
-  //     //   lastReadCardIndex: currIndex,
-  //     // }));
-  //   // }
-  // }, [playersCards, totalPlayerInfo]);
-
-  useEffect(() => {
-    console.log("playersCards", playersCards);
-  }, [playersCards]);
-
-    useEffect(() => {
-    console.log("totalPlayerInfo", totalPlayerInfo);
-  }, [totalPlayerInfo]);
-
-  // useEffect(() => {
-  //   console.log("playersCards", playersCards);
-  //   console.log("computersCards", computersCards);
-  // }, [computersCards, playersCards]);
-
-  // useEffect(() => {
-  //   console.log("totalPlayerInfo", totalPlayerInfo);
-  //   console.log("totalComputerInfo", totalComputerInfo);
-  // }, [totalComputerInfo, totalPlayerInfo]);
-
-  // const calcTotals = (currentUser: ITotalInfo, cards: ICard[]) => {
-
-  //   // calculate the current total using the last read card index
-
-  // }
-
-  // useEffect(() => {
-  //   // if the computer or the user have a number larger than 21, check if they have aces, if so subtract the 10 from the value and add 1
-  // }, []);
 
   return (
     <div className="game-arena">
@@ -341,7 +204,6 @@ function GameArena() {
             Hit
           </button>
           <button type="button" onClick={() => setDidPlayerStand(true)}>Stand</button>
-          {/* <button type="button">Reset</button> */}
         </section>
         <div>Total: {totalPlayerInfo.total}</div>
       </section>
