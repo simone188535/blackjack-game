@@ -17,7 +17,6 @@ export interface ICard {
 interface ITotalInfo {
   total: number;
   acePositions: Number[];
-  lastReadCardIndex: number;
 }
 
 function GameArena() {
@@ -28,14 +27,12 @@ function GameArena() {
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0,
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
   const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0,
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -204,6 +201,8 @@ function GameArena() {
             Hit
           </button>
           <button type="button" onClick={() => setDidPlayerStand(true)}>Stand</button>
+          {/* This is reset button can be done by resetting state but I'm out of time */}
+          <button type="button" onClick={() => {window.location.href="/"}}>Reset</button>
         </section>
         <div>Total: {totalPlayerInfo.total}</div>
       </section>
