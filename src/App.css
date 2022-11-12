@@ -1,3 +1,13 @@
 .App {
   text-align: center;
 }
+
+.game-arena {
+  display: flex;
+  height: 100vh;
+}
+
+.game-panel {
+  flex: 1 1 50%;
+}
+
