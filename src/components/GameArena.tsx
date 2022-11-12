@@ -17,7 +17,7 @@ export interface ICard {
 interface ITotalInfo {
   total: number;
   acePositions: Number[];
-  // lastReadCardIndex: number;
+  lastReadCardIndex: number;
 }
 
 function GameArena() {
@@ -28,14 +28,14 @@ function GameArena() {
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    // lastReadCardIndex: 0,
+    lastReadCardIndex: 0,
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
   const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    // lastReadCardIndex: 0,
+    lastReadCardIndex: 0,
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -130,6 +130,8 @@ function GameArena() {
   //   // }));
   // };
 
+  // to memoize, pass in the obj key instead
+
   const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
     let total = 0;
     const acePositionArr: number[] = [];
@@ -171,6 +173,62 @@ function GameArena() {
     }
   }, [calcCardTotal, computersCards]);
 
+
+  // // reset game 
+  // const resetGame = () => {
+  //   // reset deckID
+  //   setDeckId(null);
+  //   // reset players turn
+  //   setPlayerTurn(false);
+  //   // remove all cards from users
+  //   setPlayersCards([]);
+  //   setComputersCards([]);
+  //   // reset totals
+  //   setTotalPlayerInfo({
+  //     total: 0,
+  //   acePositions: [],
+  //   lastReadCardIndex: 0,
+  //   });
+  //   setTotalComputerInfo({
+  //     total: 0,
+  //   acePositions: [],
+  //   lastReadCardIndex: 0,
+  //   });
+  //   // unset winner
+  //   setDidPlayerWin(null);
+  // }
+
+  const checkForWinner = useCallback(() => {
+
+  }, []);
+  // check if a winner is present
+  useEffect(() => {
+      // if the player has a total of 21, the game is over and they win
+      if (totalPlayerInfo.total === 21) {
+        setDidPlayerWin(true);
+      } else if (totalComputerInfo.total === 21) {
+        // if the computer has a total of 21, the game is over and it wins
+        setDidPlayerWin(false);
+      } else if (totalPlayerInfo.total > 21) {
+        // if the user has a score of over 21, check to see if they have aces
+        if (totalPlayerInfo.acePositions.length > 0) {
+            // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
+            setTotalPlayerInfo((prevState) => ({
+              ...prevState,
+              total: (prevState.total - 11) + 1,
+              acePositions: prevState.acePositions.slice(0, -1),
+            }))
+        } else {
+        // if not the user automatically loses
+        setDidPlayerWin(false);
+        }
+
+      }
+  }, [totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
+  
+  useEffect(() => {
+    console.log(didPlayerWin);
+  }, [didPlayerWin]);
 
   // useEffect(() => {
   //   // if cards were added recalculate the total
@@ -251,6 +309,7 @@ function GameArena() {
             Hit
           </button>
           <button type="button">Stand</button>
+          {/* <button type="button">Reset</button> */}
         </section>
         <div>Total: {totalPlayerInfo.total}</div>
       </section>
