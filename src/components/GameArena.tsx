@@ -39,6 +39,7 @@ function GameArena() {
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
+  const [didPlayerStand, setDidPlayerStand] = useState<boolean>(false);
 
   const drawCard = useCallback(() => {
     if (deckId && playerTurn) {
@@ -199,32 +200,52 @@ function GameArena() {
   // }
 
   const checkForWinner = useCallback(() => {
-
+    
   }, []);
+  
   // check if a winner is present
   useEffect(() => {
-      // if the player has a total of 21, the game is over and they win
-      if (totalPlayerInfo.total === 21) {
-        setDidPlayerWin(true);
-      } else if (totalComputerInfo.total === 21) {
-        // if the computer has a total of 21, the game is over and it wins
-        setDidPlayerWin(false);
-      } else if (totalPlayerInfo.total > 21) {
-        // if the user has a score of over 21, check to see if they have aces
-        if (totalPlayerInfo.acePositions.length > 0) {
-            // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
-            setTotalPlayerInfo((prevState) => ({
-              ...prevState,
-              total: (prevState.total - 11) + 1,
-              acePositions: prevState.acePositions.slice(0, -1),
-            }))
-        } else {
+    // if the player has a total of 21, the game is over and they win
+    if (totalPlayerInfo.total === 21) {
+      setDidPlayerWin(true);
+    } else if (totalComputerInfo.total === 21) {
+      // if the computer has a total of 21, the game is over and it wins
+      setDidPlayerWin(false);
+    } else if (totalPlayerInfo.total > 21) {
+      // if the user has a score of over 21, check to see if they have aces
+      if (totalPlayerInfo.acePositions.length > 0) {
+          // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
+          setTotalPlayerInfo((prevState) => ({
+            ...prevState,
+            total: (prevState.total - 11) + 1,
+            acePositions: prevState.acePositions.slice(0, -1),
+          }))
+      } else {
         // if not the user automatically loses
         setDidPlayerWin(false);
-        }
-
       }
-  }, [totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
+    } else if (totalComputerInfo.total > 21) {
+      // if the Computer has a score of over 21 (2 aces), check to see if they have aces
+      if (totalComputerInfo.acePositions.length > 0) {
+          // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
+          setTotalComputerInfo((prevState) => ({
+            ...prevState,
+            total: (prevState.total - 11) + 1,
+            acePositions: prevState.acePositions.slice(0, -1),
+          }))
+      } else {
+        // if not the computer automatically loses
+        setDidPlayerWin(true);
+      }
+    } else if (didPlayerStand) {
+      // if the player did stand and there is a tie, the computer wins
+      if (totalPlayerInfo.total === totalComputerInfo.total) {
+        setDidPlayerWin(false);
+      }
+
+      
+    }
+  }, [didPlayerStand, totalComputerInfo.acePositions.length, totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
   
   useEffect(() => {
     console.log(didPlayerWin);
@@ -305,10 +326,10 @@ function GameArena() {
         <div>User</div>
         <MapCards cards={playersCards} />
         <section className="btn-container">
-          <button type="button" onClick={() => drawCard()}>
+          <button type="button" onClick={() => drawCard()} disabled={didPlayerStand}>
             Hit
           </button>
-          <button type="button">Stand</button>
+          <button type="button" onClick={() => setDidPlayerStand(true)}>Stand</button>
           {/* <button type="button">Reset</button> */}
         </section>
         <div>Total: {totalPlayerInfo.total}</div>
