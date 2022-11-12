@@ -91,99 +91,138 @@ function GameArena() {
     })();
   }, [deckId]);
 
-  useEffect(() => {
-    // if cards were added recalculate the total
+  // const calcCardTotal = (totalInfoObj: ITotalInfo, arr: ICard[]) => {
+  //   // start array at lastReadCardIndex
+  //   let currIndex = totalInfoObj.lastReadCardIndex;
+  //   console.log(currIndex);
+  //   const acePosition: Number[] = [];
 
-    const calcCardTotal = (totalInfoObj: ITotalInfo, arr: ICard[]) => {
-      // start array at lastReadCardIndex
-      let currIndex = totalInfoObj.lastReadCardIndex;
-      console.log(currIndex);
-      const acePosition: Number[] = [];
+  //   const arrFromStartingPoint = arr.slice(currIndex);
+  //   let currTotal = totalInfoObj.total;
 
-      const arrFromStartingPoint = arr.slice(currIndex);
-      let currTotal = totalInfoObj.total;
+  //   arrFromStartingPoint.forEach(({ value }) => {
+  //     // if the value is a number, simply add it to currTotal
+  //      if (value === "QUEEN" || value ==="KING" || value === "JACK") {
+  //       console.log('Face');
+  //       // if the value is a face card add 10
+  //       currTotal += 10;
+  //     } else if (value === "ACE" ) {
+  //       console.log('Ace');
+  //       // if the value is an ace, by default is equal to 11
+  //       currTotal += 11;
+  //       acePosition.push(currIndex);
+  //     } else {
+  //       const NumericVal = Number(value);
+  //       currTotal += NumericVal;
+  //     }
+  //     currIndex += 1;
+  //   });
 
-      let newCurrIndex = 0;
+  //   return { currTotal, acePosition, currIndex };
 
-      arrFromStartingPoint.forEach(({ value }) => {
+  //   // // update state for the provided obj
+
+  //   // setStateToChange((prevState) => ({
+  //   //   ...prevState,
+  //   //   total: currTotal,
+  //   //   acePositions: [...prevState.acePositions, ...acePosition],
+  //   //   lastReadCardIndex: currIndex,
+  //   // }));
+  // };
+
+  const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
+    let total = 0;
+      cardsArr.forEach(({ value }) => {
         // if the value is a number, simply add it to currTotal
-        const NumericVal = Number(value);
-        // console.log(
-        //   "NumericVal",
-        //   NumericVal,
-        //   Number.isNaN(Number(NumericVal)),
-        //   value
-        // );
-        if (!Number.isNaN(Number(NumericVal))) {
-          console.log(NumericVal);
-          currTotal += NumericVal;
-        } else if (value === "ACE" || "ace") {
-          console.log('Ace');
-          // if the value is an ace, by default is equal to 11
-          currTotal += 11;
-          acePosition.push(currIndex);
-        } else {
+         if (value === "QUEEN" || value ==="KING" || value === "JACK") {
           console.log('Face');
           // if the value is a face card add 10
-          currTotal += 10;
+          total += 10;
+        } else if (value === "ACE" ) {
+          console.log('Ace');
+          // if the value is an ace, by default is equal to 11
+          total += 11;
+          // acePosition.push(currIndex);
+        } else {
+          const NumericVal = Number(value);
+          total += NumericVal;
         }
-        currIndex += 1;
       });
 
-      return { currTotal, acePosition, currIndex };
-
-      // // update state for the provided obj
-
-      // setStateToChange((prevState) => ({
-      //   ...prevState,
-      //   total: currTotal,
-      //   acePositions: [...prevState.acePositions, ...acePosition],
-      //   lastReadCardIndex: currIndex,
-      // }));
-    };
-
-    // if the most current playersCards was not read, recalculate the total
-    if (playersCards.length !== totalPlayerInfo.lastReadCardIndex) {
-      const {
-        currTotal: currTotalPlayer,
-        acePosition: acePositionPlayer,
-        currIndex: currIndexPlayer,
-      } = calcCardTotal(totalPlayerInfo, playersCards);
-
-      // // update state for the provided obj
-
-      setTotalPlayerInfo((prevState) => ({
+      setStateFunc((prevState) => ({
         ...prevState,
-        total: currTotalPlayer,
-        acePositions: [...prevState.acePositions, ...acePositionPlayer],
-        lastReadCardIndex: currIndexPlayer,
+        total
       }));
+  }, []);
+
+  useEffect(() => {
+    // if playersCards were added recalculate the total
+    if (playersCards.length > 0) {
+      calcCardTotal(playersCards, setTotalPlayerInfo);
     }
+  }, [calcCardTotal, playersCards]);
 
-    // if the most current card was not read, recalculate the total
-    // if (computersCards.length !== totalComputerInfo.lastReadCardIndex) {
-    //   const {} = calcCardTotal(totalComputerInfo, computersCards);
+  useEffect(() => {
+    // if computersCards were added recalculate the total
+    if (computersCards.length > 0) {
+      calcCardTotal(computersCards, setTotalComputerInfo);
+    }
+  }, [calcCardTotal, computersCards]);
 
-      // // update state for the provided obj
 
-      // setTotalComputerInfo((prevState) => ({
+  // useEffect(() => {
+  //   // if cards were added recalculate the total
+
+  //   // if the most current playersCards was not read, recalculate the total
+  //   // if (playersCards.length !== totalPlayerInfo.lastReadCardIndex) {
+  //     const {
+  //       currTotal: currTotalPlayer,
+  //       acePosition: acePositionPlayer,
+  //       currIndex: currIndexPlayer,
+  //     } = calcCardTotal(totalPlayerInfo, playersCards);
+
+  //     // // update state for the provided obj
+
+      // setTotalPlayerInfo((prevState) => ({
       //   ...prevState,
-      //   total: currTotal,
-      //   acePositions: [...prevState.acePositions, ...acePosition],
-      //   lastReadCardIndex: currIndex,
+      //   total: currTotalPlayer,
+      //   acePositions: [...prevState.acePositions, ...acePositionPlayer],
+      //   lastReadCardIndex: currIndexPlayer,
       // }));
-    // }
-  }, [playersCards, totalPlayerInfo]);
+  //   // }
+
+  //   // if the most current card was not read, recalculate the total
+  //   // if (computersCards.length !== totalComputerInfo.lastReadCardIndex) {
+  //   //   const {} = calcCardTotal(totalComputerInfo, computersCards);
+
+  //     // // update state for the provided obj
+
+  //     // setTotalComputerInfo((prevState) => ({
+  //     //   ...prevState,
+  //     //   total: currTotal,
+  //     //   acePositions: [...prevState.acePositions, ...acePosition],
+  //     //   lastReadCardIndex: currIndex,
+  //     // }));
+  //   // }
+  // }, [playersCards, totalPlayerInfo]);
+
+  useEffect(() => {
+    console.log("playersCards", playersCards);
+  }, [playersCards]);
+
+    useEffect(() => {
+    console.log("totalPlayerInfo", totalPlayerInfo);
+  }, [totalPlayerInfo]);
 
   // useEffect(() => {
   //   console.log("playersCards", playersCards);
   //   console.log("computersCards", computersCards);
   // }, [computersCards, playersCards]);
 
-  useEffect(() => {
-    console.log("totalPlayerInfo", totalPlayerInfo);
-    console.log("totalComputerInfo", totalComputerInfo);
-  }, [totalComputerInfo, totalPlayerInfo]);
+  // useEffect(() => {
+  //   console.log("totalPlayerInfo", totalPlayerInfo);
+  //   console.log("totalComputerInfo", totalComputerInfo);
+  // }, [totalComputerInfo, totalPlayerInfo]);
 
   // const calcTotals = (currentUser: ITotalInfo, cards: ICard[]) => {
 
