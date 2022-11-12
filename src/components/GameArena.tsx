@@ -16,7 +16,7 @@ export interface ICard {
 
 interface ITotalInfo {
   total: number;
-  acePositions: [];
+  acePositions: Number[];
   lastReadCardIndex: number;
 }
 
@@ -25,18 +25,18 @@ function GameArena() {
   const [deckId, setDeckId] = useState<null | string>(null);
 
   const [playersCards, setPlayersCards] = useState<ICard[]>([]);
-  const [totalPlayerInfo, setTotalPlayerInfo]  = useState<ITotalInfo>({
+  const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
     lastReadCardIndex: 0,
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
-  const [totalComputerInfo, setTotalComputerInfo]  = useState<ITotalInfo>({
-  total: 0,
-  acePositions: [],
-  lastReadCardIndex: 0,
-});
+  const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
+    total: 0,
+    acePositions: [],
+    lastReadCardIndex: 0,
+  });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
 
@@ -95,47 +95,95 @@ function GameArena() {
     // if cards were added recalculate the total
 
     const calcCardTotal = (totalInfoObj: ITotalInfo, arr: ICard[]) => {
-        // start array at lastReadCardIndex
-        let currIndex = totalInfoObj.lastReadCardIndex;
-        const acePosition = [];
+      // start array at lastReadCardIndex
+      let currIndex = totalInfoObj.lastReadCardIndex;
+      console.log(currIndex);
+      const acePosition: Number[] = [];
 
-        const arrFromStartingPoint = arr.slice(currIndex);
-        let currTotal = totalInfoObj.total;
-      
-        arrFromStartingPoint.forEach(({value}) => {
-          // if the value is a number, simply add it to currTotal
-          const NumericVal = Number(value);
-          if (!!isNaN(NumericVal) === true) {
-            currTotal += NumericVal;
-          } else if (value === "ACE") {
-            // if the value is an ace, by default is equal to 11
-            currTotal += 11;
-            acePosition.push(currIndex);
-          } else {
-            // if the value is a face card add 10
-            currTotal += 10;
-          }
-          currIndex++;
-        })
+      const arrFromStartingPoint = arr.slice(currIndex);
+      let currTotal = totalInfoObj.total;
 
-        // update state for the provided obj
+      let newCurrIndex = 0;
 
-      // arr.map
-    }
+      arrFromStartingPoint.forEach(({ value }) => {
+        // if the value is a number, simply add it to currTotal
+        const NumericVal = Number(value);
+        // console.log(
+        //   "NumericVal",
+        //   NumericVal,
+        //   Number.isNaN(Number(NumericVal)),
+        //   value
+        // );
+        if (!Number.isNaN(Number(NumericVal))) {
+          console.log(NumericVal);
+          currTotal += NumericVal;
+        } else if (value === "ACE" || "ace") {
+          console.log('Ace');
+          // if the value is an ace, by default is equal to 11
+          currTotal += 11;
+          acePosition.push(currIndex);
+        } else {
+          console.log('Face');
+          // if the value is a face card add 10
+          currTotal += 10;
+        }
+        currIndex += 1;
+      });
 
-    
-    // if the most current card was not read, recalculate the total
+      return { currTotal, acePosition, currIndex };
+
+      // // update state for the provided obj
+
+      // setStateToChange((prevState) => ({
+      //   ...prevState,
+      //   total: currTotal,
+      //   acePositions: [...prevState.acePositions, ...acePosition],
+      //   lastReadCardIndex: currIndex,
+      // }));
+    };
+
+    // if the most current playersCards was not read, recalculate the total
     if (playersCards.length !== totalPlayerInfo.lastReadCardIndex) {
+      const {
+        currTotal: currTotalPlayer,
+        acePosition: acePositionPlayer,
+        currIndex: currIndexPlayer,
+      } = calcCardTotal(totalPlayerInfo, playersCards);
 
+      // // update state for the provided obj
+
+      setTotalPlayerInfo((prevState) => ({
+        ...prevState,
+        total: currTotalPlayer,
+        acePositions: [...prevState.acePositions, ...acePositionPlayer],
+        lastReadCardIndex: currIndexPlayer,
+      }));
     }
 
+    // if the most current card was not read, recalculate the total
+    // if (computersCards.length !== totalComputerInfo.lastReadCardIndex) {
+    //   const {} = calcCardTotal(totalComputerInfo, computersCards);
 
-  }, [playersCards.length, totalPlayerInfo.lastReadCardIndex]);
+      // // update state for the provided obj
+
+      // setTotalComputerInfo((prevState) => ({
+      //   ...prevState,
+      //   total: currTotal,
+      //   acePositions: [...prevState.acePositions, ...acePosition],
+      //   lastReadCardIndex: currIndex,
+      // }));
+    // }
+  }, [playersCards, totalPlayerInfo]);
+
+  // useEffect(() => {
+  //   console.log("playersCards", playersCards);
+  //   console.log("computersCards", computersCards);
+  // }, [computersCards, playersCards]);
 
   useEffect(() => {
-    console.log("playersCards", playersCards);
-    console.log("computersCards", computersCards);
-  }, [computersCards, playersCards]);
+    console.log("totalPlayerInfo", totalPlayerInfo);
+    console.log("totalComputerInfo", totalComputerInfo);
+  }, [totalComputerInfo, totalPlayerInfo]);
 
   // const calcTotals = (currentUser: ITotalInfo, cards: ICard[]) => {
 
@@ -147,15 +195,12 @@ function GameArena() {
   //   // if the computer or the user have a number larger than 21, check if they have aces, if so subtract the 10 from the value and add 1
   // }, []);
 
-
-
-
   return (
     <div className="game-arena">
       <section className="game-panel panel-one">
         <h1>Computer</h1>
         <MapCards cards={computersCards} />
-        <div>Total: {totalPlayerInfo.total}</div>
+        <div>Total: {totalComputerInfo.total}</div>
       </section>
       <section className="game-panel panel-two">
         <div>User</div>
@@ -166,7 +211,7 @@ function GameArena() {
           </button>
           <button type="button">Stand</button>
         </section>
-        <div>Total: {totalComputerInfo.total}</div>
+        <div>Total: {totalPlayerInfo.total}</div>
       </section>
     </div>
   );
