@@ -1,4 +1,3 @@
-// import axios from "axios";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import MapCards from "./MapCards";
