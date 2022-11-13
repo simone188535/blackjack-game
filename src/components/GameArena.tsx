@@ -1,5 +1,5 @@
 // import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import MapCards from "./MapCards";
 
@@ -16,10 +16,13 @@ export interface ICard {
 
 interface ITotalInfo {
   total: number;
-  acePositions: Number[];
+  acePositions: number[];
+  lastReadCardIndex: number;
 }
 
 function GameArena() {
+  const isMountedRef = useRef(false);
+
   const [playerTurn, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
 
@@ -27,12 +30,14 @@ function GameArena() {
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
+    lastReadCardIndex: 0
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
   const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
+    lastReadCardIndex: 0
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -54,6 +59,9 @@ function GameArena() {
   }, [deckId, playerTurn]);
 
   useEffect(() => {
+
+    if (isMountedRef.current) return;
+
     (async () => {
       // create a deck
       const {
@@ -62,11 +70,19 @@ function GameArena() {
 
       // save the deck_id to state
       setDeckId(deck_id);
+    
+      /* 
+      this has been added to prevent this hook from fetching a DeckId twice
+       because of React.StrictMode
+      */
+      isMountedRef.current = true;
     })();
   }, []);
 
   useEffect(() => {
     if (!deckId) return;
+
+    console.log('deckId', deckId);
 
     // initial cards for computer and player
     (async () => {
