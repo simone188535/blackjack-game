@@ -81,8 +81,6 @@ function GameArena() {
   useEffect(() => {
     if (!deckId) return;
 
-    console.log("deckId", deckId);
-
     // initial cards for computer and player
     (async () => {
       // computer draws cards
