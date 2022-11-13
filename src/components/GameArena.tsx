@@ -30,14 +30,14 @@ function GameArena() {
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0
+    lastReadCardIndex: 0,
   });
 
   const [computersCards, setComputersCards] = useState<ICard[]>([]);
   const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
     total: 0,
     acePositions: [],
-    lastReadCardIndex: 0
+    lastReadCardIndex: 0,
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -59,8 +59,13 @@ function GameArena() {
   }, [deckId, playerTurn]);
 
   useEffect(() => {
-
     if (isMountedRef.current) return;
+
+    /* 
+      this has been added to prevent this hook from fetching a DeckId twice
+       because of React.StrictMode
+      */
+    isMountedRef.current = true;
 
     (async () => {
       // create a deck
@@ -70,19 +75,13 @@ function GameArena() {
 
       // save the deck_id to state
       setDeckId(deck_id);
-    
-      /* 
-      this has been added to prevent this hook from fetching a DeckId twice
-       because of React.StrictMode
-      */
-      isMountedRef.current = true;
     })();
   }, []);
 
   useEffect(() => {
     if (!deckId) return;
 
-    console.log('deckId', deckId);
+    console.log("deckId", deckId);
 
     // initial cards for computer and player
     (async () => {
@@ -110,47 +109,74 @@ function GameArena() {
   beginning of the array, the position of the last element can be saved and the array can 
   iterate from that position rather than the beginning
   */
-  const calcCardTotal = useCallback((cardsArr: ICard[], setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>) => {
-    let total = 0;
-    const acePositionArr: number[] = [];
+  const calcCardTotal = useCallback(
+    (
+      totalInfoObj: ITotalInfo,
+      cardsArr: ICard[],
+      setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>
+    ) => {
+      let newLastReadIndex = totalInfoObj.lastReadCardIndex;
+      let newTotal = totalInfoObj.total;
+      const acePositionArr: number[] = totalInfoObj.acePositions;
 
-      cardsArr.forEach(({ value }, index) => {
+      cardsArr.slice(newLastReadIndex).forEach(({ value }, index) => {
         // if the value is a number, simply add it to currTotal
-         if (value === "QUEEN" || value ==="KING" || value === "JACK") {
+        if (value === "QUEEN" || value === "KING" || value === "JACK") {
           // if the value is a face card add 10
-          total += 10;
-        } else if (value === "ACE" ) {
+          newTotal += 10;
+        } else if (value === "ACE") {
           // if the value is an ace, by default is equal to 11
-          total += 11;
+          newTotal += 11;
           // acePosition.push(currIndex);
-          acePositionArr.push(index);
+          acePositionArr.push(newLastReadIndex);
         } else {
           const NumericVal = Number(value);
-          total += NumericVal;
+          newTotal += NumericVal;
         }
+        newLastReadIndex += 1;
       });
 
-      setStateFunc((prevState) => ({
-        ...prevState,
-        total,
-        acePositions: [...acePositionArr]
-      }));
-  }, []);
+      setStateFunc({
+        total: newTotal,
+        acePositions: [...acePositionArr],
+        lastReadCardIndex: newLastReadIndex,
+      });
+    },
+    []
+  );
 
   useEffect(() => {
-    // if playersCards were added recalculate the total
-    if (playersCards.length > 0) {
-      calcCardTotal(playersCards, setTotalPlayerInfo);
+    // if playersCards were added and the most recent card was not calculated recalculate the total
+    if (
+      playersCards.length > 0 &&
+      totalPlayerInfo.lastReadCardIndex !== playersCards.length
+    ) {
+      calcCardTotal(totalPlayerInfo, playersCards, setTotalPlayerInfo);
     }
-  }, [calcCardTotal, playersCards]);
+  }, [
+    calcCardTotal,
+    playersCards,
+    totalPlayerInfo,
+    totalPlayerInfo.acePositions,
+    totalPlayerInfo.lastReadCardIndex,
+    totalPlayerInfo.total,
+  ]);
 
   useEffect(() => {
-    // if computersCards were added recalculate the total
-    if (computersCards.length > 0) {
-      calcCardTotal(computersCards, setTotalComputerInfo);
+    // if computersCards were added and the most recent card was not calculated recalculate the total
+    if (
+      computersCards.length > 0 &&
+      totalComputerInfo.lastReadCardIndex !== computersCards.length
+    ) {
+      calcCardTotal(totalComputerInfo, computersCards, setTotalComputerInfo);
     }
-  }, [calcCardTotal, computersCards]);
-  
+  }, [
+    calcCardTotal,
+    computersCards,
+    totalComputerInfo,
+    totalComputerInfo.lastReadCardIndex,
+  ]);
+
   // check if a winner is present
   useEffect(() => {
     // if the player and the computer both get 21, the player loses
@@ -165,12 +191,12 @@ function GameArena() {
     } else if (totalPlayerInfo.total > 21) {
       // if the user has a score of over 21, check to see if they have aces
       if (totalPlayerInfo.acePositions.length > 0) {
-          // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
-          setTotalPlayerInfo((prevState) => ({
-            ...prevState,
-            total: (prevState.total - 11) + 1,
-            acePositions: prevState.acePositions.slice(0, -1),
-          }))
+        // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
+        setTotalPlayerInfo((prevState) => ({
+          ...prevState,
+          total: prevState.total - 11 + 1,
+          acePositions: prevState.acePositions.slice(0, -1),
+        }));
       } else {
         // if not the user automatically loses
         setDidPlayerWin(false);
@@ -178,19 +204,22 @@ function GameArena() {
     } else if (totalComputerInfo.total > 21) {
       // if the Computer has a score of over 21 (2 aces), check to see if they have aces
       if (totalComputerInfo.acePositions.length > 0) {
-          // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions 
-          setTotalComputerInfo((prevState) => ({
-            ...prevState,
-            total: (prevState.total - 11) + 1,
-            acePositions: prevState.acePositions.slice(0, -1),
-          }))
+        // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
+        setTotalComputerInfo((prevState) => ({
+          ...prevState,
+          total: prevState.total - 11 + 1,
+          acePositions: prevState.acePositions.slice(0, -1),
+        }));
       } else {
         // if not the computer automatically loses
         setDidPlayerWin(true);
       }
     } else if (didPlayerStand) {
       // if the player did stand and there is a tie OR the users cards total less than the computers cards, the computer wins
-      if (totalPlayerInfo.total === totalComputerInfo.total || totalPlayerInfo.total < totalComputerInfo.total) {
+      if (
+        totalPlayerInfo.total === totalComputerInfo.total ||
+        totalPlayerInfo.total < totalComputerInfo.total
+      ) {
         setDidPlayerWin(false);
       }
 
@@ -202,37 +231,56 @@ function GameArena() {
         setDidPlayerWin(false);
       }
     }
-  }, [didPlayerStand, totalComputerInfo.acePositions.length, totalComputerInfo.total, totalPlayerInfo.acePositions.length, totalPlayerInfo.total]);
-  
+  }, [
+    didPlayerStand,
+    totalComputerInfo.acePositions.length,
+    totalComputerInfo.total,
+    totalPlayerInfo.acePositions.length,
+    totalPlayerInfo.total,
+  ]);
+
   const winLoseText = () => {
     if (didPlayerWin === null) return <></>;
-    return <div>{(didPlayerWin) ? "You Won" : "You Lose"}</div>;
-  }
+    return <div>{didPlayerWin ? "You Won" : "You Lose"}</div>;
+  };
 
   return (
     <>
-    {winLoseText()}
-    <div className="game-arena">
-      <section className="game-panel panel-one">
-        <h1>Computer</h1>
-        <MapCards cards={computersCards} />
-        <div>Total: {totalComputerInfo.total}</div>
-      </section>
-      <section className="game-panel panel-two">
-        <h1>User</h1>
-        <MapCards cards={playersCards} />
-        <div>Total: {totalPlayerInfo.total}</div>
-        {winLoseText()}
-        <section className="btn-container">
-          <button type="button" onClick={() => drawCard()} disabled={didPlayerStand || didPlayerWin !== null}>
-            Hit
-          </button>
-          <button type="button" onClick={() => setDidPlayerStand(true)}>Stand</button>
-          {/* This is reset button can be done by resetting state but I'm out of time */}
-          <button type="button" onClick={() => {window.location.href="/"}}>Reset</button>
+      {winLoseText()}
+      <div className="game-arena">
+        <section className="game-panel panel-one">
+          <h1>Computer</h1>
+          <MapCards cards={computersCards} />
+          <div>Total: {totalComputerInfo.total}</div>
         </section>
-      </section>
-    </div>
+        <section className="game-panel panel-two">
+          <h1>User</h1>
+          <MapCards cards={playersCards} />
+          <div>Total: {totalPlayerInfo.total}</div>
+          {winLoseText()}
+          <section className="btn-container">
+            <button
+              type="button"
+              onClick={() => drawCard()}
+              disabled={didPlayerStand || didPlayerWin !== null}
+            >
+              Hit
+            </button>
+            <button type="button" onClick={() => setDidPlayerStand(true)}>
+              Stand
+            </button>
+            {/* This is reset button can be done by resetting state but I'm out of time */}
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "/";
+              }}
+            >
+              Reset
+            </button>
+          </section>
+        </section>
+      </div>
     </>
   );
 }
