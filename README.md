@@ -7,7 +7,7 @@ Technology: React, Typescript, HTML, CSS.
 
 
 ## Visuals
-![Black Jack](./asset/images/personal-portfolio.png)
+![Black Jack](./src/asset/blackjack.png)
 ## Game Rules
 
 If you’re not familiar with the game, here are the **simplified rules we will be going by for this project.** We know this isn't Blackjack exactly, but try not to deviate from the requirements (even if you're a Blackjack veteran 🃏)**:**
