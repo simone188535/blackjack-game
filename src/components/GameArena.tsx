@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { ICard } from "../Types/Cards";
 import { ITotalInfo } from "../Types/TotalInfo";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
-import MapCards from "./MapCards";
 import GameResults from "./GameResults";
 import PlayerPanel from "./PlayerPanel";
 
