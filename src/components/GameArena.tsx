@@ -4,6 +4,7 @@ import { ITotalInfo } from "../Types/TotalInfo";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import MapCards from "./MapCards";
 import GameResults from "./GameResults";
+import PlayerPanel from "./PlayerPanel";
 
 function GameArena() {
   const isMountedRef = useRef(false);
@@ -153,48 +154,52 @@ function GameArena() {
   ]);
 
   return (
-      <div className="game-arena">
-        <section className="game-panel panel-one">
-          <h1>Computer</h1>
-          <MapCards cards={computersCards} />
-          <div>Total: {totalComputerInfo.total}</div>
-        </section>
-        <section className="game-panel panel-two">
-          <h1>User</h1>
-          <MapCards cards={playersCards} />
-          <div>Total: {totalPlayerInfo.total}</div>
-          <GameResults
-            totalPlayerInfo={totalPlayerInfo}
-            totalComputerInfo={totalComputerInfo}
-            didPlayerStand={didPlayerStand}
-            didPlayerWin={didPlayerWin}
-            setDidPlayerWin={setDidPlayerWin}
-            setTotalPlayerInfo={setTotalPlayerInfo}
-            setTotalComputerInfo={setTotalComputerInfo}
-          />
-          <section className="btn-container">
-            <button
-              type="button"
-              onClick={() => drawCard()}
-              disabled={didPlayerStand || didPlayerWin !== null}
-            >
-              Hit
-            </button>
-            <button type="button" onClick={() => setDidPlayerStand(true)}>
-              Stand
-            </button>
-            {/* This is reset button can be done by resetting state but I'm out of time */}
-            <button
-              type="button"
-              onClick={() => {
-                window.location.href = "/";
-              }}
-            >
-              Reset
-            </button>
-          </section>
-        </section>
-      </div>
+    <div className="game-arena">
+      <PlayerPanel
+        header="Computer"
+        cards={computersCards}
+        playerTotal={totalComputerInfo.total}
+      />
+      <PlayerPanel
+        header="User"
+        cards={playersCards}
+        playerTotal={totalPlayerInfo.total}
+        render={() => (
+          <>
+            <GameResults
+              totalPlayerInfo={totalPlayerInfo}
+              totalComputerInfo={totalComputerInfo}
+              didPlayerStand={didPlayerStand}
+              didPlayerWin={didPlayerWin}
+              setDidPlayerWin={setDidPlayerWin}
+              setTotalPlayerInfo={setTotalPlayerInfo}
+              setTotalComputerInfo={setTotalComputerInfo}
+            />
+            <section className="btn-container">
+              <button
+                type="button"
+                onClick={() => drawCard()}
+                disabled={didPlayerStand || didPlayerWin !== null}
+              >
+                Hit
+              </button>
+              <button type="button" onClick={() => setDidPlayerStand(true)}>
+                Stand
+              </button>
+              {/* This is reset button can be done by resetting state but I'm out of time */}
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+              >
+                Reset
+              </button>
+            </section>
+          </>
+        )}
+      />
+    </div>
   );
 }
 
