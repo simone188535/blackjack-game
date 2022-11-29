@@ -152,113 +152,6 @@ function GameArena() {
     totalComputerInfo,
   ]);
 
-<<<<<<< HEAD
-  // check if a winner is present
-  useEffect(() => {
-    // if the player and the computer both get 21, the player loses
-    if (totalPlayerInfo.total === 21 && totalComputerInfo.total === 21) {
-      setDidPlayerWin(false);
-    } else if (totalPlayerInfo.total === 21) {
-      // if the player has a total of 21, the game is over and they win
-      setDidPlayerWin(true);
-    } else if (totalComputerInfo.total === 21) {
-      // if the computer has a total of 21, the game is over and it wins
-      setDidPlayerWin(false);
-    } else if (totalPlayerInfo.total > 21) {
-      // if the user has a score of over 21, check to see if they have aces
-      if (totalPlayerInfo.acePositions.length > 0) {
-        // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
-        setTotalPlayerInfo((prevState) => ({
-          ...prevState,
-          total: prevState.total - 11 + 1,
-          acePositions: prevState.acePositions.slice(0, -1),
-        }));
-      } else {
-        // if not the user automatically loses
-        setDidPlayerWin(false);
-      }
-    } else if (totalComputerInfo.total > 21) {
-      // if the Computer has a score of over 21 (2 aces), check to see if they have aces
-      if (totalComputerInfo.acePositions.length > 0) {
-        // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
-        setTotalComputerInfo((prevState) => ({
-          ...prevState,
-          total: prevState.total - 11 + 1,
-          acePositions: prevState.acePositions.slice(0, -1),
-        }));
-      } else {
-        // if not the computer automatically loses
-        setDidPlayerWin(true);
-      }
-    } else if (didPlayerStand) {
-      // if the player did stand and there is a tie OR the users cards total less than the computers cards, the computer wins
-      if (
-        totalPlayerInfo.total === totalComputerInfo.total ||
-        totalPlayerInfo.total < totalComputerInfo.total
-      ) {
-        setDidPlayerWin(false);
-      }
-
-      // if the player has more points than the computer, the pplayer wins
-      if (totalPlayerInfo.total > totalComputerInfo.total) {
-        setDidPlayerWin(true);
-      } else {
-        // if the player and computer tie or the player has few points than the computer, the player loses
-        setDidPlayerWin(false);
-      }
-    }
-  }, [
-    didPlayerStand,
-    totalComputerInfo.acePositions.length,
-    totalComputerInfo.total,
-    totalPlayerInfo.acePositions.length,
-    totalPlayerInfo.total,
-  ]);
-
-  const winLoseText = () => {
-    if (didPlayerWin === null) return <></>;
-    return <div>{didPlayerWin ? "You Won" : "You Lose"}</div>;
-  };
-
-  return (
-    <>
-      {winLoseText()}
-      <div className="game-arena">
-        <section className="game-panel panel-one">
-          <h1>Computer</h1>
-          <MapCards cards={computersCards} />
-          <div>Total: {totalComputerInfo.total}</div>
-        </section>
-        <section className="game-panel panel-two">
-          <h1>User</h1>
-          <MapCards cards={playersCards} />
-          <div>Total: {totalPlayerInfo.total}</div>
-          {winLoseText()}
-          <section className="btn-container">
-            <button
-              type="button"
-              onClick={() => drawCard()}
-              disabled={didPlayerStand || didPlayerWin !== null}
-            >
-              Hit
-            </button>
-            <button type="button" onClick={() => setDidPlayerStand(true)}>
-              Stand
-            </button>
-            {/* This is reset button can be done by resetting state but I'm out of time */}
-            <button
-              type="button"
-              onClick={() => {
-                window.location.href = "/";
-              }}
-            >
-              Reset
-            </button>
-          </section>
-        </section>
-      </div>
-    </>
-=======
   return (
     <div className="game-arena">
       <PlayerPanel
@@ -306,7 +199,6 @@ function GameArena() {
         )}
       />
     </div>
->>>>>>> development
   );
 }
 
