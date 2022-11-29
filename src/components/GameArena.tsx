@@ -88,7 +88,7 @@ function GameArena() {
   }, [deckId]);
 
   /* 
-  In the future, this calculation can be memoized, instead of calculating the total from the
+  This calculation is memoized, instead of calculating the total from the
   beginning of the array, the position of the last element can be saved and the array can 
   iterate from that position rather than the beginning
   */
