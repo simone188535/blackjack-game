@@ -13,7 +13,7 @@ const MapCards = ({ cards }: IMapCardsProps) => {
     </li>
   ));
 
-  return <ul>{mappedCards}</ul>;
+  return <ul className="cards-container">{mappedCards}</ul>;
 };
 
 export default MapCards;
