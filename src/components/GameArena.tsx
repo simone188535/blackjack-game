@@ -1,17 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ICard } from "../Types/Cards";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import MapCards from "./MapCards";
-
-export interface ICard {
-  code: string;
-  image: string;
-  images: {
-    svg: string;
-    png: string;
-  };
-  value: string;
-  suit: string;
-}
 
 interface ITotalInfo {
   total: number;

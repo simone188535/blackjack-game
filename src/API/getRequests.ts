@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ICard } from "../components/GameArena";
+import { ICard } from "../Types/Cards";
 
 const fetchNewDeck = () =>
   axios<{ deck_id: string }>(`https://deckofcardsapi.com/api/deck/new/shuffle/`);

@@ -1,4 +1,4 @@
-import { ICard } from "./GameArena";
+import { ICard } from "../Types/Cards";
 
 interface IMapCardsProps {
   cards: ICard[];
