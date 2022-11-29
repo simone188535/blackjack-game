@@ -42,21 +42,7 @@ function GameArena() {
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
   const [didPlayerStand, setDidPlayerStand] = useState<boolean>(false);
 
-  const drawCard = useCallback(() => {
-    if (deckId && playerTurn) {
-      // else it is players turn to pick a card
-      (async () => {
-        const {
-          data: { cards },
-        } = await drawCards(deckId);
-        // add card to playersCards
-        setPlayersCards((prevState) => [...prevState, ...cards]);
-        // the player is done drawing a card
-        // setPlayerTurn(false);
-      })();
-    }
-  }, [deckId, playerTurn]);
-
+  // on init create deck and set deck id
   useEffect(() => {
     if (isMountedRef.current) return;
 
@@ -77,6 +63,21 @@ function GameArena() {
     })();
   }, []);
 
+  const drawCard = useCallback(() => {
+    if (deckId && playerTurn) {
+      // else it is players turn to pick a card
+      (async () => {
+        const {
+          data: { cards },
+        } = await drawCards(deckId);
+        // add card to playersCards
+        setPlayersCards((prevState) => [...prevState, ...cards]);
+        // the player is done drawing a card
+      })();
+    }
+  }, [deckId, playerTurn]);
+
+  // once a deck id is present, draw 2 cards for both the computer and player
   useEffect(() => {
     if (!deckId) return;
 
@@ -116,7 +117,7 @@ function GameArena() {
       let newTotal = totalInfoObj.total;
       const acePositionArr: number[] = totalInfoObj.acePositions;
 
-      cardsArr.slice(newLastReadIndex).forEach(({ value }, index) => {
+      cardsArr.slice(newLastReadIndex).forEach(({ value }) => {
         // if the value is a number, simply add it to currTotal
         if (value === "QUEEN" || value === "KING" || value === "JACK") {
           // if the value is a face card add 10
@@ -124,7 +125,6 @@ function GameArena() {
         } else if (value === "ACE") {
           // if the value is an ace, by default is equal to 11
           newTotal += 11;
-          // acePosition.push(currIndex);
           acePositionArr.push(newLastReadIndex);
         } else {
           const NumericVal = Number(value);
@@ -150,16 +150,7 @@ function GameArena() {
     ) {
       calcCardTotal(totalPlayerInfo, playersCards, setTotalPlayerInfo);
     }
-  }, [
-    calcCardTotal,
-    playersCards,
-    totalPlayerInfo,
-    totalPlayerInfo.acePositions,
-    totalPlayerInfo.lastReadCardIndex,
-    totalPlayerInfo.total,
-  ]);
 
-  useEffect(() => {
     // if computersCards were added and the most recent card was not calculated recalculate the total
     if (
       computersCards.length > 0 &&
@@ -169,9 +160,10 @@ function GameArena() {
     }
   }, [
     calcCardTotal,
+    playersCards,
+    totalPlayerInfo,
     computersCards,
     totalComputerInfo,
-    totalComputerInfo.lastReadCardIndex,
   ]);
 
   // check if a winner is present
