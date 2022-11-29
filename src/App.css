@@ -1,0 +1,16 @@
+.App {
+  text-align: center;
+}
+
+.game-arena {
+  display: flex;
+}
+
+.game-arena .game-panel {
+  flex: 1 1 50%;
+}
+
+.game-arena .game-panel .cards-container {
+  list-style-type: none;
+}
+
