@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ICard } from "../Types/Cards";
-import { ITotalInfo } from "../Types/TotalInfo";
+import { ITotalInfo, ITotalInfoKey } from "../Types/TotalInfo";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import GameResults from "./GameResults";
 import PlayerPanel from "./PlayerPanel";
@@ -8,25 +8,13 @@ import PlayerPanel from "./PlayerPanel";
 function GameArena() {
   const isMountedRef = useRef(false);
 
-  const [playerTurn, setPlayerTurn] = useState(false);
+  const [_, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
 
-  const [playersCards, setPlayersCards] = useState<ICard[]>([]);
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
-    total: 0,
-    acePositions: [],
-    lastReadCardIndex: 0,
+    player: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },
+    computer: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },
   });
-
-  const [computersCards, setComputersCards] = useState<ICard[]>([]);
-  const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
-    total: 0,
-    acePositions: [],
-    lastReadCardIndex: 0,
-  });
-
-  const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
-  const [didPlayerStand, setDidPlayerStand] = useState<boolean>(false);
 
   // on init create deck and set deck id
   useEffect(() => {
@@ -49,20 +37,6 @@ function GameArena() {
     })();
   }, []);
 
-  const drawCard = useCallback(() => {
-    if (deckId && playerTurn) {
-      // else it is players turn to pick a card
-      (async () => {
-        const {
-          data: { cards },
-        } = await drawCards(deckId);
-        // add card to playersCards
-        setPlayersCards((prevState) => [...prevState, ...cards]);
-        // the player is done drawing a card
-      })();
-    }
-  }, [deckId, playerTurn]);
-
   // once a deck id is present, draw 2 cards for both the computer and player
   useEffect(() => {
     if (!deckId) return;
@@ -74,34 +48,39 @@ function GameArena() {
         data: { cards: computersCards },
       } = await drawCards(deckId, 2);
 
-      setComputersCards(computersCards);
-
       // player draws cards
       const {
         data: { cards: playerCards },
       } = await drawCards(deckId, 2);
 
-      setPlayersCards(playerCards);
+      // add first 2 cards for player and computer
+      setTotalPlayerInfo((prevState) => ({
+        ...prevState,
+        computer: {
+          ...prevState.computer,
+          cards: computersCards
+        },
+        player: {
+          ...prevState.player,
+          cards: playerCards
+        },
+      }));
 
       // change turns
       setPlayerTurn(true);
     })();
   }, [deckId]);
 
-  /* 
+  useEffect(() => {
+    /* 
   This calculation is memoized, instead of calculating the total from the
   beginning of the array, the position of the last element can be saved and the array can 
   iterate from that position rather than the beginning
   */
-  const calcCardTotal = useCallback(
-    (
-      totalInfoObj: ITotalInfo,
-      cardsArr: ICard[],
-      setStateFunc: React.Dispatch<React.SetStateAction<ITotalInfo>>
-    ) => {
-      let newLastReadIndex = totalInfoObj.lastReadCardIndex;
-      let newTotal = totalInfoObj.total;
-      const acePositionArr: number[] = totalInfoObj.acePositions;
+    const calcCardTotal = (objKey: ITotalInfoKey, cardsArr: ICard[]) => {
+      let newLastReadIndex = totalPlayerInfo[objKey].lastReadCardIndex;
+      let newTotal = totalPlayerInfo[objKey].total;
+      const acePositionArr: number[] = totalPlayerInfo[objKey].acePositions;
 
       cardsArr.slice(newLastReadIndex).forEach(({ value }) => {
         // if the value is a number, simply add it to currTotal
@@ -119,83 +98,54 @@ function GameArena() {
         newLastReadIndex += 1;
       });
 
-      setStateFunc({
-        total: newTotal,
-        acePositions: [...acePositionArr],
-        lastReadCardIndex: newLastReadIndex,
-      });
-    },
-    []
-  );
+      setTotalPlayerInfo((prevState) => ({
+        ...prevState,
+        [objKey]: {
+          ...prevState[objKey],
+          total: newTotal,
+          acePositions: [...acePositionArr],
+          lastReadCardIndex: newLastReadIndex,
+        },
+      }));
+    };
 
-  useEffect(() => {
     // if playersCards were added and the most recent card was not calculated recalculate the total
+    const playerCards = totalPlayerInfo.player.cards;
+    const computerCards = totalPlayerInfo.computer.cards;
+
     if (
-      playersCards.length > 0 &&
-      totalPlayerInfo.lastReadCardIndex !== playersCards.length
+      playerCards.length > 0 &&
+      totalPlayerInfo.player.lastReadCardIndex !== playerCards.length
     ) {
-      calcCardTotal(totalPlayerInfo, playersCards, setTotalPlayerInfo);
+      calcCardTotal("player", playerCards);
     }
 
     // if computersCards were added and the most recent card was not calculated recalculate the total
     if (
-      computersCards.length > 0 &&
-      totalComputerInfo.lastReadCardIndex !== computersCards.length
+      computerCards.length > 0 &&
+      totalPlayerInfo.computer.lastReadCardIndex !== computerCards.length
     ) {
-      calcCardTotal(totalComputerInfo, computersCards, setTotalComputerInfo);
+      calcCardTotal("computer", computerCards);
     }
-  }, [
-    calcCardTotal,
-    playersCards,
-    totalPlayerInfo,
-    computersCards,
-    totalComputerInfo,
-  ]);
+  }, [totalPlayerInfo]);
 
   return (
     <div className="game-arena">
       <PlayerPanel
         header="Computer"
-        cards={computersCards}
-        playerTotal={totalComputerInfo.total}
+        cards={totalPlayerInfo.computer.cards}
+        playerTotal={totalPlayerInfo.computer.total}
       />
       <PlayerPanel
         header="User"
-        cards={playersCards}
-        playerTotal={totalPlayerInfo.total}
+        cards={totalPlayerInfo.player.cards}
+        playerTotal={totalPlayerInfo.player.total}
         render={() => (
-          <>
             <GameResults
               totalPlayerInfo={totalPlayerInfo}
-              totalComputerInfo={totalComputerInfo}
-              didPlayerStand={didPlayerStand}
-              didPlayerWin={didPlayerWin}
-              setDidPlayerWin={setDidPlayerWin}
+              deckId={deckId}
               setTotalPlayerInfo={setTotalPlayerInfo}
-              setTotalComputerInfo={setTotalComputerInfo}
             />
-            <section className="btn-container">
-              <button
-                type="button"
-                onClick={() => drawCard()}
-                disabled={didPlayerStand || didPlayerWin !== null}
-              >
-                Hit
-              </button>
-              <button type="button" onClick={() => setDidPlayerStand(true)}>
-                Stand
-              </button>
-              {/* This is reset button can be done by resetting state but I'm out of time */}
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = "/";
-                }}
-              >
-                Reset
-              </button>
-            </section>
-          </>
         )}
       />
     </div>
