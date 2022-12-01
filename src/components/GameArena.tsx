@@ -177,40 +177,40 @@ function GameArena() {
         header="User"
         cards={totalPlayerInfo.player.cards}
         playerTotal={totalPlayerInfo.player.total}
-        // render={() => (
-        //   <>
-        //     <GameResults
-        //       totalPlayerInfo={totalPlayerInfo}
-        //       totalComputerInfo={totalComputerInfo}
-        //       didPlayerStand={didPlayerStand}
-        //       didPlayerWin={didPlayerWin}
-        //       setDidPlayerWin={setDidPlayerWin}
-        //       setTotalPlayerInfo={setTotalPlayerInfo}
-        //       setTotalComputerInfo={setTotalComputerInfo}
-        //     />
-        //     <section className="btn-container">
-        //       <button
-        //         type="button"
-        //         onClick={() => drawCard()}
-        //         disabled={didPlayerStand || didPlayerWin !== null}
-        //       >
-        //         Hit
-        //       </button>
-        //       <button type="button" onClick={() => setDidPlayerStand(true)}>
-        //         Stand
-        //       </button>
-        //       {/* This is reset button can be done by resetting state but I'm out of time */}
-        //       <button
-        //         type="button"
-        //         onClick={() => {
-        //           window.location.href = "/";
-        //         }}
-        //       >
-        //         Reset
-        //       </button>
-        //     </section>
-        //   </>
-        // )}
+        render={() => (
+          <>
+            <GameResults
+              totalPlayerInfo={totalPlayerInfo}
+              // totalComputerInfo={totalComputerInfo}
+              didPlayerStand={didPlayerStand}
+              didPlayerWin={didPlayerWin}
+              setDidPlayerWin={setDidPlayerWin}
+              setTotalPlayerInfo={setTotalPlayerInfo}
+              // setTotalComputerInfo={setTotalComputerInfo}
+            />
+            <section className="btn-container">
+              <button
+                type="button"
+                onClick={() => drawCard()}
+                disabled={didPlayerStand || didPlayerWin !== null}
+              >
+                Hit
+              </button>
+              <button type="button" onClick={() => setDidPlayerStand(true)}>
+                Stand
+              </button>
+              {/* This is reset button can be done by resetting state but I'm out of time */}
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = "/";
+                }}
+              >
+                Reset
+              </button>
+            </section>
+          </>
+        )}
       />
     </div>
   );
