@@ -93,13 +93,13 @@ function GameArena() {
     })();
   }, [deckId]);
 
-  /* 
+  useEffect(() => {
+    /* 
   This calculation is memoized, instead of calculating the total from the
   beginning of the array, the position of the last element can be saved and the array can 
   iterate from that position rather than the beginning
   */
-  const calcCardTotal = useCallback(
-    (objKey: ITotalInfoKey, cardsArr: ICard[]) => {
+    const calcCardTotal = (objKey: ITotalInfoKey, cardsArr: ICard[]) => {
       let newLastReadIndex = totalPlayerInfo[objKey].lastReadCardIndex;
       let newTotal = totalPlayerInfo[objKey].total;
       const acePositionArr: number[] = totalPlayerInfo[objKey].acePositions;
@@ -121,22 +121,15 @@ function GameArena() {
       });
 
       setTotalPlayerInfo((prevState) => ({
-          ...prevState,
-          [objKey]: {
-            total: newTotal,
-            acePositions: [...acePositionArr],
-            lastReadCardIndex: newLastReadIndex,
-          },
-        }));
-    },
-    []
-  );
+        ...prevState,
+        [objKey]: {
+          total: newTotal,
+          acePositions: [...acePositionArr],
+          lastReadCardIndex: newLastReadIndex,
+        },
+      }));
+    };
 
-  useEffect(() => {
-    console.log("totalPlayerInfo", totalPlayerInfo);
-  }, [totalPlayerInfo]);
-
-  useEffect(() => {
     // if playersCards were added and the most recent card was not calculated recalculate the total
     if (
       playersCards.length > 0 &&
@@ -152,13 +145,7 @@ function GameArena() {
     ) {
       calcCardTotal("computer", computersCards);
     }
-  }, [
-    calcCardTotal,
-    computersCards,
-    playersCards,
-    totalPlayerInfo.computer.lastReadCardIndex,
-    totalPlayerInfo.player.lastReadCardIndex,
-  ]);
+  }, [computersCards, playersCards, totalPlayerInfo]);
 
   return (
     <div className="game-arena">
