@@ -1,7 +1,9 @@
+import { ICard } from './Cards';
 export interface IPlayerInfo {
     total: number;
     acePositions: number[];
     lastReadCardIndex: number;
+    cards: ICard[];
 }
 
 export interface ITotalInfo {
