@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PlayerControlPanel from "./PlayerControlPanel";
 import { ITotalInfo } from "../Types/TotalInfo";
+
 interface IGameResultsTextProps {
   didPlayerWin: boolean | null;
 }
@@ -104,6 +105,7 @@ function GameResults({
 
   return (
     <>
+    <GameResultsText didPlayerWin={didPlayerWin} />
       <PlayerControlPanel
         setDidPlayerStand={setDidPlayerStand}
         didPlayerWin={didPlayerWin}
@@ -111,7 +113,6 @@ function GameResults({
         deckId={deckId}
         setTotalPlayerInfo={setTotalPlayerInfo}
       />
-      <GameResultsText didPlayerWin={didPlayerWin} />
     </>
   );
 }
