@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ICard } from "../Types/Cards";
 import { ITotalInfo, ITotalInfoKey } from "../Types/TotalInfo";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
@@ -8,22 +8,8 @@ import PlayerPanel from "./PlayerPanel";
 function GameArena() {
   const isMountedRef = useRef(false);
 
-  const [playerTurn, setPlayerTurn] = useState(false);
+  const [_, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
-
-  // const [playersCards, setPlayersCards] = useState<ICard[]>([]);
-  // const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
-  //   total: 0,
-  //   acePositions: [],
-  //   lastReadCardIndex: 0,
-  // });
-
-  // const [computersCards, setComputersCards] = useState<ICard[]>([]);
-  // const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
-  //   total: 0,
-  //   acePositions: [],
-  //   lastReadCardIndex: 0,
-  // });
 
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
     player: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },

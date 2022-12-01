@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PlayerControlPanel from "./PlayerControlPanel";
-import { ITotalInfo } from "../Types/TotalInfo";
+import { ITotalInfo, ITotalInfoKey } from "../Types/TotalInfo";
 
 interface IGameResultsTextProps {
   didPlayerWin: boolean | null;
@@ -32,61 +32,57 @@ function GameResults({
 
   // check if a winner is present
   useEffect(() => {
+    const playerTotal = totalPlayerInfo.player.total;
+    const computerTotal = totalPlayerInfo.computer.total;
+    const playerNumAces = totalPlayerInfo.player.acePositions.length;
+    const computerNumAces = totalPlayerInfo.computer.acePositions.length;
+
+    // helper to set the correct totalInfo Obj
+    const setTotalInfoObj = (objKey: ITotalInfoKey) =>
+      setTotalPlayerInfo((prevState) => ({
+        ...prevState,
+        [objKey]: {
+          ...prevState[objKey],
+          total: prevState[objKey].total - 11 + 1,
+          acePositions: prevState[objKey].acePositions.slice(0, -1),
+        },
+      }));
+
     // if the player and the computer both get 21, the player loses
-    if (
-      totalPlayerInfo.player.total === 21 &&
-      totalPlayerInfo.computer.total === 21
-    ) {
+    if (playerTotal === 21 && computerTotal === 21) {
       setDidPlayerWin(false);
-    } else if (totalPlayerInfo.player.total === 21) {
+    } else if (playerTotal === 21) {
       // if the player has a total of 21, the game is over and they win
       setDidPlayerWin(true);
-    } else if (totalPlayerInfo.computer.total === 21) {
+    } else if (computerTotal === 21) {
       // if the computer has a total of 21, the game is over and it wins
       setDidPlayerWin(false);
-    } else if (totalPlayerInfo.player.total > 21) {
+    } else if (playerTotal > 21) {
       // if the user has a score of over 21, check to see if they have aces
-      if (totalPlayerInfo.player.acePositions.length > 0) {
+      if (playerNumAces > 0) {
         // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
-        setTotalPlayerInfo((prevState) => ({
-          ...prevState,
-          player: {
-            ...prevState.player,
-            total: prevState.player.total - 11 + 1,
-            acePositions: prevState.player.acePositions.slice(0, -1),
-          },
-        }));
+        setTotalInfoObj("player");
       } else {
         // if not the user automatically loses
         setDidPlayerWin(false);
       }
-    } else if (totalPlayerInfo.computer.total > 21) {
+    } else if (computerTotal > 21) {
       // if the Computer has a score of over 21 (2 aces), check to see if they have aces
-      if (totalPlayerInfo.computer.acePositions.length > 0) {
+      if (computerNumAces > 0) {
         // if there are aces, subtract 11 points from the user and add 1, pop an ace from the acePositions
-        setTotalPlayerInfo((prevState) => ({
-          ...prevState,
-          computer: {
-            ...prevState.computer,
-            total: prevState.computer.total - 11 + 1,
-            acePositions: prevState.computer.acePositions.slice(0, -1),
-          },
-        }));
+        setTotalInfoObj("computer");
       } else {
         // if not the computer automatically loses
         setDidPlayerWin(true);
       }
     } else if (didPlayerStand) {
       // if the player did stand and there is a tie OR the users cards total less than the computers cards, the computer wins
-      if (
-        totalPlayerInfo.player.total === totalPlayerInfo.computer.total ||
-        totalPlayerInfo.player.total < totalPlayerInfo.computer.total
-      ) {
+      if (playerTotal === computerTotal || playerTotal < computerTotal) {
         setDidPlayerWin(false);
       }
 
-      // if the player has more points than the computer, the pplayer wins
-      if (totalPlayerInfo.player.total > totalPlayerInfo.computer.total) {
+      // if the player has more points than the computer, the player wins
+      if (playerTotal > computerTotal) {
         setDidPlayerWin(true);
       } else {
         // if the player and computer tie or the player has few points than the computer, the player loses
@@ -95,7 +91,6 @@ function GameResults({
     }
   }, [
     didPlayerStand,
-    setDidPlayerWin,
     setTotalPlayerInfo,
     totalPlayerInfo.computer.acePositions.length,
     totalPlayerInfo.computer.total,
@@ -105,7 +100,7 @@ function GameResults({
 
   return (
     <>
-    <GameResultsText didPlayerWin={didPlayerWin} />
+      <GameResultsText didPlayerWin={didPlayerWin} />
       <PlayerControlPanel
         setDidPlayerStand={setDidPlayerStand}
         didPlayerWin={didPlayerWin}
