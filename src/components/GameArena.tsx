@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ICard } from "../Types/Cards";
-import { ITotalInfo, IPlayerInfo, ITotalInfoKey } from "../Types/TotalInfo";
+import { ITotalInfo, ITotalInfoKey } from "../Types/TotalInfo";
 import { fetchNewDeck, drawCards } from "../API/getRequests";
 import GameResults from "./GameResults";
 import PlayerPanel from "./PlayerPanel";
@@ -11,14 +11,14 @@ function GameArena() {
   const [playerTurn, setPlayerTurn] = useState(false);
   const [deckId, setDeckId] = useState<null | string>(null);
 
-  const [playersCards, setPlayersCards] = useState<ICard[]>([]);
+  // const [playersCards, setPlayersCards] = useState<ICard[]>([]);
   // const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
   //   total: 0,
   //   acePositions: [],
   //   lastReadCardIndex: 0,
   // });
 
-  const [computersCards, setComputersCards] = useState<ICard[]>([]);
+  // const [computersCards, setComputersCards] = useState<ICard[]>([]);
   // const [totalComputerInfo, setTotalComputerInfo] = useState<ITotalInfo>({
   //   total: 0,
   //   acePositions: [],
@@ -26,8 +26,8 @@ function GameArena() {
   // });
 
   const [totalPlayerInfo, setTotalPlayerInfo] = useState<ITotalInfo>({
-    player: { total: 0, acePositions: [], lastReadCardIndex: 0 },
-    computer: { total: 0, acePositions: [], lastReadCardIndex: 0 },
+    player: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },
+    computer: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },
   });
 
   const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
@@ -62,7 +62,13 @@ function GameArena() {
           data: { cards },
         } = await drawCards(deckId);
         // add card to playersCards
-        setPlayersCards((prevState) => [...prevState, ...cards]);
+        setTotalPlayerInfo((prevState) => ({
+          ...prevState,
+          player: {
+            ...prevState.player,
+            cards: [...prevState.player.cards, ...cards]
+          },
+        }));
         // the player is done drawing a card
       })();
     }
@@ -79,14 +85,23 @@ function GameArena() {
         data: { cards: computersCards },
       } = await drawCards(deckId, 2);
 
-      setComputersCards(computersCards);
-
       // player draws cards
       const {
         data: { cards: playerCards },
       } = await drawCards(deckId, 2);
 
-      setPlayersCards(playerCards);
+      // add first 2 cards for player and computer
+      setTotalPlayerInfo((prevState) => ({
+        ...prevState,
+        computer: {
+          ...prevState.computer,
+          cards: computersCards
+        },
+        player: {
+          ...prevState.player,
+          cards: playerCards
+        },
+      }));
 
       // change turns
       setPlayerTurn(true);
@@ -123,6 +138,7 @@ function GameArena() {
       setTotalPlayerInfo((prevState) => ({
         ...prevState,
         [objKey]: {
+          ...prevState[objKey],
           total: newTotal,
           acePositions: [...acePositionArr],
           lastReadCardIndex: newLastReadIndex,
@@ -131,32 +147,35 @@ function GameArena() {
     };
 
     // if playersCards were added and the most recent card was not calculated recalculate the total
+    const playerCards = totalPlayerInfo.player.cards;
+    const computerCards = totalPlayerInfo.computer.cards;
+
     if (
-      playersCards.length > 0 &&
-      totalPlayerInfo.player.lastReadCardIndex !== playersCards.length
+      playerCards.length > 0 &&
+      totalPlayerInfo.player.lastReadCardIndex !== playerCards.length
     ) {
-      calcCardTotal("player", playersCards);
+      calcCardTotal("player", playerCards);
     }
 
     // if computersCards were added and the most recent card was not calculated recalculate the total
     if (
-      computersCards.length > 0 &&
-      totalPlayerInfo.computer.lastReadCardIndex !== computersCards.length
+      computerCards.length > 0 &&
+      totalPlayerInfo.computer.lastReadCardIndex !== computerCards.length
     ) {
-      calcCardTotal("computer", computersCards);
+      calcCardTotal("computer", computerCards);
     }
-  }, [computersCards, playersCards, totalPlayerInfo]);
+  }, [totalPlayerInfo]);
 
   return (
     <div className="game-arena">
       <PlayerPanel
         header="Computer"
-        cards={computersCards}
+        cards={totalPlayerInfo.computer.cards}
         playerTotal={totalPlayerInfo.computer.total}
       />
       <PlayerPanel
         header="User"
-        cards={playersCards}
+        cards={totalPlayerInfo.player.cards}
         playerTotal={totalPlayerInfo.player.total}
         // render={() => (
         //   <>
