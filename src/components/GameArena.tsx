@@ -30,9 +30,6 @@ function GameArena() {
     computer: { total: 0, acePositions: [], lastReadCardIndex: 0, cards: [] },
   });
 
-  const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
-  const [didPlayerStand, setDidPlayerStand] = useState<boolean>(false);
-
   // on init create deck and set deck id
   useEffect(() => {
     if (isMountedRef.current) return;
@@ -53,26 +50,6 @@ function GameArena() {
       setDeckId(deck_id);
     })();
   }, []);
-
-  const drawCard = useCallback(() => {
-    if (deckId && playerTurn) {
-      // else it is players turn to pick a card
-      (async () => {
-        const {
-          data: { cards },
-        } = await drawCards(deckId);
-        // add card to playersCards
-        setTotalPlayerInfo((prevState) => ({
-          ...prevState,
-          player: {
-            ...prevState.player,
-            cards: [...prevState.player.cards, ...cards]
-          },
-        }));
-        // the player is done drawing a card
-      })();
-    }
-  }, [deckId, playerTurn]);
 
   // once a deck id is present, draw 2 cards for both the computer and player
   useEffect(() => {
@@ -178,38 +155,11 @@ function GameArena() {
         cards={totalPlayerInfo.player.cards}
         playerTotal={totalPlayerInfo.player.total}
         render={() => (
-          <>
             <GameResults
               totalPlayerInfo={totalPlayerInfo}
-              // totalComputerInfo={totalComputerInfo}
-              didPlayerStand={didPlayerStand}
-              didPlayerWin={didPlayerWin}
-              setDidPlayerWin={setDidPlayerWin}
+              deckId={deckId}
               setTotalPlayerInfo={setTotalPlayerInfo}
-              // setTotalComputerInfo={setTotalComputerInfo}
             />
-            <section className="btn-container">
-              <button
-                type="button"
-                onClick={() => drawCard()}
-                disabled={didPlayerStand || didPlayerWin !== null}
-              >
-                Hit
-              </button>
-              <button type="button" onClick={() => setDidPlayerStand(true)}>
-                Stand
-              </button>
-              {/* This is reset button can be done by resetting state but I'm out of time */}
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = "/";
-                }}
-              >
-                Reset
-              </button>
-            </section>
-          </>
         )}
       />
     </div>

@@ -1,24 +1,82 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { drawCards } from "../API/getRequests";
 import { ITotalInfo } from "../Types/TotalInfo";
-
-type SetStateTotalInfo = React.Dispatch<React.SetStateAction<ITotalInfo>>;
-
-interface GameResultsProps {
-  totalPlayerInfo: ITotalInfo;
+interface PlayerControlPanelProps {
+  setTotalPlayerInfo: React.Dispatch<React.SetStateAction<ITotalInfo>>;
+  setDidPlayerStand: React.Dispatch<React.SetStateAction<boolean>>;
   didPlayerStand: boolean;
   didPlayerWin: null | boolean;
-  setDidPlayerWin: React.Dispatch<React.SetStateAction<boolean | null>>;
-  setTotalPlayerInfo: SetStateTotalInfo;
+  deckId: null | string;
+}
+interface GameResultsProps {
+  totalPlayerInfo: ITotalInfo;
+  setTotalPlayerInfo: React.Dispatch<React.SetStateAction<ITotalInfo>>;
+  deckId: null | string;
 }
 
-function GameResults({
-  totalPlayerInfo,
+function PlayerControlPanel({
+  setTotalPlayerInfo,
+  setDidPlayerStand,
   didPlayerStand,
   didPlayerWin,
-  setDidPlayerWin,
+  deckId,
+}: PlayerControlPanelProps) {
+
+  const isDisabled = didPlayerStand || didPlayerWin !== null;
+  
+  const drawCard = () => {
+    if (deckId) {
+      // else it is players turn to pick a card
+      (async () => {
+        const {
+          data: { cards },
+        } = await drawCards(deckId);
+        // add card to playersCards
+        setTotalPlayerInfo((prevState) => ({
+          ...prevState,
+          player: {
+            ...prevState.player,
+            cards: [...prevState.player.cards, ...cards],
+          },
+        }));
+        // the player is done drawing a card
+      })();
+    }
+  };
+
+  return (
+    <section className="btn-container">
+      <button
+        type="button"
+        onClick={() => drawCard()}
+        disabled={isDisabled}
+      >
+        Hit
+      </button>
+      <button type="button" onClick={() => setDidPlayerStand(true)} disabled={isDisabled}>
+        Stand
+      </button>
+      {/* This is reset button can be done by resetting state but I'm out of time */}
+      <button
+        type="button"
+        onClick={() => {
+          window.location.href = "/";
+        }}
+      >
+        Reset
+      </button>
+    </section>
+  );
+}
+function GameResults({
+  totalPlayerInfo,
   setTotalPlayerInfo,
+  deckId,
 }: GameResultsProps) {
-  // // check if a winner is present
+  const [didPlayerWin, setDidPlayerWin] = useState<null | boolean>(null);
+  const [didPlayerStand, setDidPlayerStand] = useState<boolean>(false);
+
+  // check if a winner is present
   useEffect(() => {
     // if the player and the computer both get 21, the player loses
     if (
@@ -98,7 +156,18 @@ function GameResults({
       <div>{didPlayerWin ? "You Won" : "You Lose"}</div>
     );
 
-  return winLoseText;
+  return (
+    <>
+      <PlayerControlPanel
+        setDidPlayerStand={setDidPlayerStand}
+        didPlayerWin={didPlayerWin}
+        didPlayerStand={didPlayerStand}
+        deckId={deckId}
+        setTotalPlayerInfo={setTotalPlayerInfo}
+      />
+      {winLoseText}
+    </>
+  );
 }
 
 export default GameResults;
